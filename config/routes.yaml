@@ -1,0 +1,62 @@
+controllers:
+    resource:
+        path: ../src/Controller/
+        namespace: App\Controller
+    type: attribute
+
+
+getall:
+    path: /allFourniture
+    controller: App\Controller\ProductController::index
+    methods: ['GET']
+user_create:
+    path: /userCreate
+    controller: App\Controller\UserController::createUser
+    methods: ['POST']
+
+api_login_check:
+    path: /api/login
+
+app_user_info:
+    path: 'api/userInfo'
+    controller: 'App\Controller\AuthController::getUserInfo'
+    methods: ['GET']
+
+app_logout:
+    path: /api/logout
+    controller: 'App\Controller\AuthController::logout'
+    methods: ['POST']
+
+update_user:
+  path: /api/users
+  controller: App\Controller\UserController::updateUser
+  methods: ['PUT']
+
+
+add_to_favorite:
+    path: '/api/favorite/add'
+    controller: 'App\Controller\FavoriteController::addToFavorite'
+    methods: ['POST']
+
+remove_from_favorite:
+    path: '/api/favorite/remove'
+    controller: 'App\Controller\FavoriteController::removeFromFavorite'
+    methods: ['POST']
+
+favorite_get:
+    path: /api/get_favorite_Product
+    controller: App\Controller\FavoriteController::getFavorites
+    methods: POST
+
+recommendations_post:
+    path: /api/recommendations
+    controller: App\Controller\RecommendationController::recommend
+    methods: POST
+image_prediction_api:
+    path: /api/image/predict
+    controller: 'App\Controller\ImagePredictionApiController::predictAndRecommend'
+    methods: ['POST']
+image_upload:
+    path: /api/upload
+    controller: 'App\Controller\ImageUploadController::upload'
+    methods: ['POST']
