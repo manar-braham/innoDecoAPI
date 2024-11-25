@@ -51,42 +51,39 @@ class UserController extends AbstractController
 
     #[Route('/api/users', name: 'update_user', methods: ['PUT'])]
     public function updateUser(Request $request, DocumentManager $dm): Response
-{
-    // Récupérer les données de la requête JSON
-    $data = json_decode($request->getContent(), true);
+    {
+        // Récupérer les données de la requête JSON
+        $data = json_decode($request->getContent(), true);
 
-    // Vérifier si l'utilisateur est authentifié
-    if (!$this->security->isGranted('IS_AUTHENTICATED_FULLY')) {
-        return $this->json(['message' => 'Accès non autorisé'], 403);
+        // Vérifier si l'utilisateur est authentifié
+        if (!$this->isGranted('IS_AUTHENTICATED_FULLY')) {
+            return $this->json(['message' => 'Accès non autorisé'], 403);
+        }
+
+        // Récupérer l'utilisateur à modifier
+        $user = $dm->getRepository(User::class)->findOneBy(['username' => $data['username']]);
+
+        // Vérifier si l'utilisateur existe
+        if (!$user) {
+            return $this->json(['message' => 'Utilisateur non trouvé'], 404);
+        }
+
+        // Vérifier si l'utilisateur authentifié est autorisé à modifier l'utilisateur
+        if ($user->getId() !== $this->getUser()->getId()) {
+            return $this->json(['message' => 'Accès non autorisé à cet utilisateur'], 403);
+        }
+
+        // Mettre à jour les champs de l'utilisateur
+        $user->setFirstName($data['firstName'] ?? $user->getFirstName());
+        $user->setLastName($data['lastName'] ?? $user->getLastName());
+        $user->setBirthDate(new \DateTime($data['birthDate']) ?? $user->getBirthDate());
+        $user->setGender($data['gender'] ?? $user->getGender());
+
+        // Persister les changements dans la base de données
+        $dm->flush();
+
+        // Retourner une réponse JSON
+        return $this->json(['message' => 'Utilisateur mis à jour avec succès']);
     }
-
-    // Récupérer l'utilisateur à modifier
-    $user = $dm->getRepository(User::class)->findOneBy(['username' => $data['username']]);
-
-    // Vérifier si l'utilisateur existe
-    if (!$user) {
-        return $this->json(['message' => 'Utilisateur non trouvé'], 404);
-    }
-
-    // Vérifier si l'utilisateur authentifié est autorisé à modifier l'utilisateur
-    if ($user->getId() !== $this->getUser()->getId()) {
-        return $this->json(['message' => 'Accès non autorisé à cet utilisateur'], 403);
-    }
-
-    // Mettre à jour les champs de l'utilisateur
-    $user->setFirstName($data['firstName'] ?? $user->getFirstName());
-    $user->setLastName($data['lastName'] ?? $user->getLastName());
-    $user->setUsername($data['lastName'] ?? $user->getUsername());
-    $user->setPassword($data['password'] ?? $user->getPassword());
-    $user->setBirthdaydate(new \DateTime($data['birthDate']) ?? $user->getBirthDate());
-    $user->setGender($data['gender'] ?? $user->getGender());
-    $user->setRole($data['role'] ?? $user->getRole() ?? 'ROLE_USER');
-    
-    // Persister les changements dans la base de données
-    $dm->flush();
-
-    // Retourner une réponse JSON
-    return $this->json(['message' => 'Utilisateur mis à jour avec succès']);
-}
    
 }
